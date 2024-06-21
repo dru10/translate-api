@@ -1,15 +1,14 @@
+LANGUAGE_MAPPING = {
+    "en": "english",
+    "fr": "french",
+    "de": "german",
+    "ro": "romanian",
+}
+
+
 def convert_language_to_iso(language: str) -> str:
     language = language.lower()
-    iso_mapping = {
-        "english": "en",
-        "chinese": "zh",
-        "french": "fr",
-        "german": "de",
-        "spanish": "es",
-        "italian": "it",
-        "portuguese": "pt",
-        "romanian": "ro",
-    }
+    iso_mapping = {v: k for k, v in LANGUAGE_MAPPING.items()}
     try:
         return iso_mapping[language]
     except KeyError as e:

@@ -25,6 +25,12 @@ class TranslationRequest(BaseModel):
     target_language: str = "romanian"
 
 
+class TaskStatus(BaseModel):
+    status: str
+    result: list | None = None
+    id: str | None = None
+
+
 @app.post("/translate")
 async def api_translate(text: TranslationRequest):
     try:
@@ -34,10 +40,22 @@ async def api_translate(text: TranslationRequest):
         raise APIException(
             message=str(e), status_code=status.HTTP_400_BAD_REQUEST
         ) from e
+    if source_iso == target_iso:
+        raise APIException(
+            message="Source and target languages are the same",
+            status_code=status.HTTP_400_BAD_REQUEST,
+        )
+    if source_iso != "en":
+        raise APIException(
+            message="Only English is supported as source language",
+            status_code=status.HTTP_400_BAD_REQUEST,
+        )
+
     task = translate.apply_async(
-        args=[text.text], task_id="translate-" + str(uuid.uuid4())
+        args=[text.text, source_iso, target_iso],
+        task_id="translate-" + str(uuid.uuid4()),
     )
-    return {"status": task.status, "id": task.id}
+    return TaskStatus(status=task.status, id=task.id, result=task.result)
 
 
 @app.get("/translate/{task_id}")
@@ -47,4 +65,4 @@ async def read_translate(task_id: str):
             message="Wrong task id", status_code=status.HTTP_400_BAD_REQUEST
         )
     task = translate.AsyncResult(task_id)
-    return {"status": task.status, "result": task.result}
+    return TaskStatus(status=task.status, id=task.id, result=task.result)
