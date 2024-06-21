@@ -17,6 +17,7 @@ accelerate = "^0.31.0"
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.4.9"
 ipython = "^8.25.0"
+watchdog = "^4.0.1"
 
 [build-system]
 requires = ["poetry-core"]
