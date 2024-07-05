@@ -4,3 +4,4 @@ __pycache__/
 .mypy**
 *.png
 *.txt
+.coverage
